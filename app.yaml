@@ -16,10 +16,20 @@ spec :
     spec : 
       containers :
       - name : mon-app
-        image : mon-app-test:v1  #Mon image
-        imagePullPolicy: IfNotPresent #Indique a K8s a ne pas chercher sur internet
+        # image : mon-app-test:v1  #Mon image
+        # imagePullPolicy: IfNotPresent #Indique a K8s a ne pas chercher sur internet
+
+        #1. On remplace le nom de l'image par l'URL complète de GHCR
+        image : ghcr.io/mrocher-manitou/devops-lab/mon-app-test:latest
+        #2. On force K8s à vérifier s'il y a une nouveauté en ligne
+        imagePullPolicy : Always
+
+
         ports : 
         - containerPort : 8080  #le port dans mon code Js
+        
+        
+
 
 --- # permet de mettre 2 confs dans 1 seul fichier yaml
 #2. Ou ouvre la porte reseau  pour y acceder (le Service)
