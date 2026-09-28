@@ -1,0 +1,37 @@
+#1. On demande a creer les conteneurs (le Deployement)
+
+apiVersion : apps/v1
+kind : Deployment
+metadata:
+  name : mon-app-web
+spec :
+  replicas : 2   #On demande 2 copies de notre app
+  selector : 
+    matchLabels : 
+      app : web 
+  template : 
+    metadata:
+      labels:
+        app : web
+    spec : 
+      containers :
+      - name : mon-app
+        image : mon-app-test:v1  #Mon image
+        imagePullPolicy: IfNotPresent #Indique a K8s a ne pas chercher sur internet
+        ports : 
+        - containerPort : 8080  #le port dans mon code Js
+
+--- # permet de mettre 2 confs dans 1 seul fichier yaml
+#2. Ou ouvre la porte reseau  pour y acceder (le Service)
+
+apiVersion : v1
+kind : Service
+metadata:
+  name : mon-service-web
+spec : 
+  selector : 
+    app : web #le Service va diriger le trafic vers les pods qui ont ce label
+  ports : 
+  - port : 80 
+    targetPort : 8080 #redirige vers le port 8080 du conteneur
+
