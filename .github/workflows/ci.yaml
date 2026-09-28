@@ -11,9 +11,9 @@ jobs:
   build-and-publish:
     runs-on: ubuntu-latest # le robot utilisera un serveur linx vierge
 
-    #autorisations pour publier l'image sur le registre github
+    #autorisations pour publier l'image sur le registre github et écrire sur le dépot git
     permissions :
-      contents: read
+      contents: write
       packages : write
     
     steps : 
@@ -29,11 +29,26 @@ jobs:
         username : ${{ github.actor}}
         password : ${{ secrets.GITHUB_TOKEN }} # Mot de passe géneré tout seul !
 
-    # Etape C : Il construit l'image et l'envoie en ligne
+    # Etape C : Il construit l'image et l'envoie en ligne, et utilise les 7 premiers caractrèes de l'Id du commit comme Tag
     - name : Construire et pousser l'image
       uses : docker/build-push-action@v5
       with : 
         context : .
         push : true
         # L'image sera nomée d'après votre nom d'utilisateur et le nom du dépôt
-        tags : ghcr.io/${{ github.repository }}/mon-app-test:latest
+        tags : ghcr.io/${{ github.repository }}/mon-app-test:${{ github.sha }}
+
+    # Le reobot ouvre le fichier YAML et remplace la ligne de l'image
+    - name : Mettre a jour le fichier YAML
+
+      run : |          # L'outil 'sed' cherche l'ancienne ligne et la remplace par la nouvelle avec le tag unique
+        sed -i "s|image: ghcr.io/mrocher-manitou/devops-lab/mon-app-test:.*|image: ghcr.io/mrocher-manitou/devops-lab/mon-app-test:${{ github.sha }}|g" app.yaml
+
+    #  Le robot commit le fichier modifié et le pousse sur GitHub
+    - name : Sauvegarder la nouvelle version sur GitHub
+      run : |
+        git config --global user.name "Robot DevOps"
+        git config --global user.email "actions@github.com"
+        git add app.yaml
+        git commit -m "Auto-déploiement : mise à jour vers la version ${{ github:sha }}"
+        git push
