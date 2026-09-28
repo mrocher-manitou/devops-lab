@@ -20,7 +20,7 @@ spec :
         # imagePullPolicy: IfNotPresent #Indique a K8s a ne pas chercher sur internet
 
         #1. On remplace le nom de l'image par l'URL complète de GHCR
-        image : ghcr.io/mrocher-manitou/devops-lab/mon-app-test:latest
+        image: ghcr.io/mrocher-manitou/devops-lab/mon-app-test:latest
         #2. On force K8s à vérifier s'il y a une nouveauté en ligne
         imagePullPolicy : Always
 
