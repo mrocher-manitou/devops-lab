@@ -1,0 +1,39 @@
+name : Pipeline CI Docker
+
+#1. Quand déclencher ce pipeline ?
+on:
+  push:
+    branches:
+      - main #à chaque push sur la branche principale
+
+#2. Que doit faire le robot ?
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest # le robot utilisera un serveur linx vierge
+
+    #autorisations pour publier l'image sur le registre github
+    permissions :
+      contents: read
+      packages : write
+    
+    steps : 
+    # Etape A : le robot va télécharger votre code
+    - name : Récuperer le code
+      uses : actions/checkout@v4
+
+    # Etape B : Il se connecte au registre Docker de GitHub
+    - name : Connexion a GitHub Container Registry
+      uses : docker/login-action@v3
+      with : 
+        registry : ghcr.io
+        username : ${{ github.actor}}
+        password : ${{ secrets.GITHUB_TOKEN }} # Mot de passe géneré tout seul !
+
+    # Etape C : Il construit l'image et l'envoie en ligne
+    - name : Construire et pousser l'image
+      uses : docker/build-push-action@v5
+      with : 
+        context : .
+        push : true
+        # L'image sera nomée d'après votre nom d'utilisateur et le nom du dépôt
+        tags : ghcr.io/${{ github.repository }}/mon-app-test:latest
