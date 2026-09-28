@@ -50,5 +50,5 @@ jobs:
         git config --global user.name "Robot DevOps"
         git config --global user.email "actions@github.com"
         git add app.yaml
-        git commit -m "Auto-déploiement : mise à jour vers la version ${{ github:sha }}"
+        git commit -m "Auto-déploiement : mise à jour vers la version ${{ github.sha }}"
         git push
